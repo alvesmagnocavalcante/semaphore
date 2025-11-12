@@ -5,8 +5,8 @@ WORKDIR /app
 # Instala dependências básicas
 RUN apk add --no-cache git bash sqlite
 
-# Instala o Semaphore versão estável (com caminho /v2/)
-RUN go install github.com/ansible-semaphore/semaphore/v2/cmd/semaphore@v2.9.45
+# Instala o Semaphore versão 2.10.37 (com caminho /v2/)
+RUN go install github.com/ansible-semaphore/semaphore/v2/cmd/semaphore@v2.10.37
 
 # Variáveis de ambiente
 ENV SEMAPHORE_ADMIN=admin \
