@@ -12,17 +12,19 @@ ENV SEMAPHORE_DB_DIALECT=sqlite3 \
 WORKDIR /tmp/semaphore
 EXPOSE 3000
 
-# Cria o config.json manualmente
-RUN echo '{
+# Cria o config.json corretamente com EOF
+RUN cat <<EOF > /tmp/config.json
+{
   "dialect": "sqlite3",
   "db": "/tmp/semaphore.db",
   "port": 3000,
   "interface": "0.0.0.0",
   "tmp_path": "/tmp",
   "access_key_encryption": "gs72mPntFATGJs9qK0pQ0rKtfidlexiMjYCH9gWKhTU"
-}' > /tmp/config.json
+}
+EOF
 
-# Comando para criar o admin automaticamente e iniciar o servidor
+# Cria usuário admin e inicia o servidor
 CMD semaphore user add \
     --admin \
     --login "$SEMAPHORE_ADMIN" \
