@@ -9,9 +9,6 @@ ENV SEMAPHORE_DB_DIALECT=postgres \
     SEMAPHORE_ACCESS_KEY_ENCRYPTION=gs72mPntFATGJs9qK0pQ0rKtfidlexiMjYCH9gWKhTU= \
     PORT=3000
 
-# Criar diretório de dados
-RUN mkdir -p /data /tmp/semaphore
-
 # Expor porta
 EXPOSE 3000
 
