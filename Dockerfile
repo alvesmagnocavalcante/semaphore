@@ -1,6 +1,11 @@
 FROM semaphoreui/semaphore:latest
 
 ENV SEMAPHORE_DB_DIALECT=postgres \
+    SEMAPHORE_DB_HOST=${SEMAPHORE_DB_HOST} \
+    SEMAPHORE_DB_PORT=5432 \
+    SEMAPHORE_DB_USER=${SEMAPHORE_DB_USER} \
+    SEMAPHORE_DB_PASS=${SEMAPHORE_DB_PASS} \
+    SEMAPHORE_DB_NAME=${SEMAPHORE_DB_NAME} \
     SEMAPHORE_ADMIN=admin \
     SEMAPHORE_ADMIN_PASSWORD=admin \
     SEMAPHORE_ADMIN_NAME=Admin \
@@ -9,5 +14,4 @@ ENV SEMAPHORE_DB_DIALECT=postgres \
     PORT=3000
 
 EXPOSE 3000
-
-# Use o comando padrão da imagem – se a imagem já define o entrypoint/cmd correto
+WORKDIR /tmp/semaphore
