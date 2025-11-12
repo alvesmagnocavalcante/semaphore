@@ -12,8 +12,16 @@ ENV SEMAPHORE_DB_DIALECT=sqlite3 \
 WORKDIR /tmp/semaphore
 EXPOSE 3000
 
-# Cria o arquivo de configuração automaticamente
-RUN semaphore setup --config /tmp/config.json --admin admin --email alvesmagnocavalcante@gmail.com --name Admin --login admin --password admin --tmpdir /tmp --db sqlite3 --db-path /tmp/semaphore.db --access-key-encryption gs72mPntFATGJs9qK0pQ0rKtfidlexiMjYCH9gWKhTU
-
-# Inicia o servidor com o config.json gerado
-CMD ["semaphore", "server", "--config", "/tmp/config.json"]
+# Executa o setup e depois inicia o servidor
+CMD semaphore setup \
+    --config /tmp/config.json \
+    --admin "$SEMAPHORE_ADMIN" \
+    --email "$SEMAPHORE_ADMIN_EMAIL" \
+    --name "$SEMAPHORE_ADMIN_NAME" \
+    --login "$SEMAPHORE_ADMIN" \
+    --password "$SEMAPHORE_ADMIN_PASSWORD" \
+    --tmpdir /tmp \
+    --db "$SEMAPHORE_DB_DIALECT" \
+    --db-path "$SEMAPHORE_DB_PATH" \
+    --access-key-encryption "$SEMAPHORE_ACCESS_KEY_ENCRYPTION" \
+ && semaphore server --config /tmp/config.json
