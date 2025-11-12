@@ -2,11 +2,11 @@ FROM golang:1.22-alpine
 
 WORKDIR /app
 
-# Instala dependências
+# Instala dependências básicas
 RUN apk add --no-cache git bash sqlite
 
-# Instala o Semaphore
-RUN go install github.com/ansible-semaphore/semaphore/v3/cmd/semaphore@latest
+# Instala o Semaphore (versão estável atual)
+RUN go install github.com/ansible-semaphore/semaphore/cmd/semaphore@v2.16.45
 
 # Variáveis de ambiente
 ENV SEMAPHORE_ADMIN=admin \
