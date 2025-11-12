@@ -12,22 +12,15 @@ ENV SEMAPHORE_DB_DIALECT=sqlite3 \
 WORKDIR /tmp/semaphore
 EXPOSE 3000
 
-CMD bash -c '\
-cat > /tmp/config.json <<EOF
-{
-  "dialect": "sqlite3",
-  "db": "/tmp/semaphore.db",
-  "port": 3000,
-  "interface": "0.0.0.0",
-  "tmp_path": "/tmp",
-  "access_key_encryption": "gs72mPntFATGJs9qK0pQ0rKtfidlexiMjYCH9gWKhTU"
-}
-EOF
-&& semaphore user add \
-    --admin \
-    --login "$SEMAPHORE_ADMIN" \
-    --name "$SEMAPHORE_ADMIN_NAME" \
-    --email "$SEMAPHORE_ADMIN_EMAIL" \
-    --password "$SEMAPHORE_ADMIN_PASSWORD" \
-    --config /tmp/config.json || true \
-&& semaphore server --config /tmp/config.json'
+CMD ["/bin/bash", "-c", "cat <<'EOF' > /tmp/config.json\n\
+{\n\
+  \"dialect\": \"sqlite3\",\n\
+  \"db\": \"/tmp/semaphore.db\",\n\
+  \"port\": 3000,\n\
+  \"interface\": \"0.0.0.0\",\n\
+  \"tmp_path\": \"/tmp\",\n\
+  \"access_key_encryption\": \"gs72mPntFATGJs9qK0pQ0rKtfidlexiMjYCH9gWKhTU\"\n\
+}\n\
+EOF\n\
+&& semaphore user add --admin --login \"$SEMAPHORE_ADMIN\" --name \"$SEMAPHORE_ADMIN_NAME\" --email \"$SEMAPHORE_ADMIN_EMAIL\" --password \"$SEMAPHORE_ADMIN_PASSWORD\" --config /tmp/config.json || true\n\
+&& semaphore server --config /tmp/config.json"]
