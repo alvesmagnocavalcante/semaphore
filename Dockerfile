@@ -1,26 +1,42 @@
-FROM semaphoreui/semaphore:latest
+FROM golang:1.22-alpine
 
-ENV SEMAPHORE_DB_DIALECT=sqlite3 \
-    SEMAPHORE_DB_PATH=/tmp/semaphore.db \
-    SEMAPHORE_ADMIN=admin \
-    SEMAPHORE_ADMIN_PASSWORD=admin \
-    SEMAPHORE_ADMIN_NAME=Admin \
-    SEMAPHORE_ADMIN_EMAIL=alvesmagnocavalcante@gmail.com \
-    SEMAPHORE_ACCESS_KEY_ENCRYPTION=gs72mPntFATGJs9qK0pQ0rKtfidlexiMjYCH9gWKhTU \
-    PORT=3000
+WORKDIR /app
 
-WORKDIR /tmp/semaphore
+# Instala dependências
+RUN apk add --no-cache git bash sqlite
+
+# Instala o Semaphore
+RUN go install github.com/ansible-semaphore/semaphore/v3/cmd/semaphore@latest
+
+# Variáveis de ambiente
+ENV SEMAPHORE_ADMIN=admin \
+    SEMAPHORE_ADMIN_NAME="Admin User" \
+    SEMAPHORE_ADMIN_EMAIL="admin@example.com" \
+    SEMAPHORE_ADMIN_PASSWORD=admin123 \
+    SEMAPHORE_DB=/tmp/semaphore.db \
+    SEMAPHORE_CONFIG=/tmp/config.json
+
+# Cria o arquivo de configuração JSON
+RUN echo '{ \
+  "dialect": "sqlite3", \
+  "db": "/tmp/semaphore.db", \
+  "port": "3000", \
+  "interface": "0.0.0.0", \
+  "tmp_path": "/tmp/semaphore_tmp", \
+  "cookie_hash": "abc123", \
+  "cookie_encryption": "xyz789" \
+}' > /tmp/config.json
+
+# Expõe a porta
 EXPOSE 3000
 
-CMD ["/bin/bash", "-c", "cat <<'EOF' > /tmp/config.json\n\
-{\n\
-  \"dialect\": \"sqlite3\",\n\
-  \"db\": \"/tmp/semaphore.db\",\n\
-  \"port\": 3000,\n\
-  \"interface\": \"0.0.0.0\",\n\
-  \"tmp_path\": \"/tmp\",\n\
-  \"access_key_encryption\": \"gs72mPntFATGJs9qK0pQ0rKtfidlexiMjYCH9gWKhTU\"\n\
-}\n\
-EOF\n\
-&& semaphore user add --admin --login \"$SEMAPHORE_ADMIN\" --name \"$SEMAPHORE_ADMIN_NAME\" --email \"$SEMAPHORE_ADMIN_EMAIL\" --password \"$SEMAPHORE_ADMIN_PASSWORD\" --config /tmp/config.json || true\n\
-&& semaphore server --config /tmp/config.json"]
+# Inicializa o banco e cria usuário admin
+CMD bash -c "\
+  semaphore migrate --config /tmp/config.json && \
+  semaphore user add --login \"$SEMAPHORE_ADMIN\" \
+    --name \"$SEMAPHORE_ADMIN_NAME\" \
+    --email \"$SEMAPHORE_ADMIN_EMAIL\" \
+    --password \"$SEMAPHORE_ADMIN_PASSWORD\" \
+    --admin \
+    --config /tmp/config.json || true && \
+  semaphore server --config /tmp/config.json"
